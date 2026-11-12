@@ -1,0 +1,483 @@
+#include<stdio.h>
+#include<stdlib.h>
+
+//Define o tam que o vetor tem
+#define tamanho 7
+
+#define num_bucket 10
+
+
+//Algoritmo de ordenacao BubbleSort
+void BubbleSort(int* v, int tam) {
+    int i, j = tam, k;
+    int trocou;
+    do {
+        tam--;
+        trocou = 0;
+        for (i = 0; i < tam; i++) {
+            if (v[i] > v[i + 1]) {
+                int aux = 0;
+                aux = v[i];
+                v[i] = v[i + 1];
+                v[i + 1] = aux;
+                trocou = 1;
+                for (k = 0; k < j; k++)
+                printf("%d ", v[k]);
+                printf("\n");
+            }
+        }
+    } while (trocou);
+}
+
+//Algoritmo de ordenacao QuickSort
+void QuickSort(int* v, int tam) {
+    int j = tam, k;
+    if (tam <= 1)
+    return;
+    else {
+        int pivot = v[0];
+        int a = 1;
+        int b = tam - 1;
+        do {
+            while ((a < tam) && (v[a] <= pivot))
+            a++;
+            while (v[b] > pivot)
+            b--;
+            if (a < b) { // faz troca
+                int temp = v[a];
+                v[a] = v[b];
+                v[b] = temp;
+                a++;
+                b--;
+            }
+            for (k = 0; k < j; k++)
+            printf("%d ", v[k]);
+            printf("\n");
+        } while (a <= b);
+        // troca pivo
+        v[0] = v[b];
+        v[b] = pivot;
+        // ordena sub-vetores restantes
+        QuickSort(v, b);
+        QuickSort(&v[a], tam - a);
+        for (k = 0; k < j; k++)
+        printf("%d ", v[k]);
+        printf("\n");
+    }
+}
+
+//Algoritmo de ordenacao InsertionSort
+void InsertionSort(int* v, int tam) {
+    int i, j, k, chave;
+    for (j = 1; j < tam; j++) {
+        chave = v[j];
+        i = j - 1;
+        while ((i >= 0) && (v[i] > chave)) {
+            v[i + 1] = v[i];
+            i--;
+        }
+        v[i + 1] = chave;
+        for (k = 0; k < tam; k++)
+        printf("%d ", v[k]);
+        printf("\n");
+    }
+    for (k = 0; k < tam; k++)
+    printf("%d ", v[k]);
+    printf("\n");
+}
+
+// Busca Binária para achar o local a se inserido
+// no vet[inicio..fim]
+int buscaBin(int* vet, int item, int inicio, int fim)
+{
+    if (fim <= inicio)
+    return (item > vet[inicio]) ? (inicio + 1) : inicio;
+
+    int meio = (inicio + fim) / 2;
+
+    if (item == vet[meio])
+    return meio + 1;
+
+    if (item > vet[meio])
+    return buscaBin(vet, item, meio + 1, fim);
+    return buscaBin(vet, item, inicio, meio - 1);
+}
+
+
+//Algoritmo de insercao com busca binaria
+void insertionBinSort(int* vet, int tam)
+{
+    int atual, loc, aux, valor;
+
+    for (atual = 1; atual < tam; ++atual)
+    {
+        aux = atual - 1;
+        valor = vet[atual];
+        // achar o locat onde o valor deve ser inserido
+        loc = buscaBin(vet, valor, 0, aux);
+        // Move all elements after location to create space
+        while (aux >= loc)
+        {
+            vet[aux + 1] = vet[aux];
+            aux--;
+        }
+        vet[aux + 1] = valor;
+        for (int z = 0; z < tam; z++) {
+            printf("%d ", vet[z]);
+            if (z == atual)
+            printf(" ");
+        }
+        printf("\n");
+    }
+}
+
+
+
+//Algoritmo de ordenacao SelectionSort
+void SelectionSort(int* v, int tam) {
+    int i, j, k, min;
+    for (i = 0; i < (tam - 1); i++) {
+        min = i;
+        for (j = (i + 1); j < tam; j++) {
+            if (v[j] < v[min]) {
+                min = j;
+            }
+        }
+        if (i != min) {
+            int swap = v[i];
+            v[i] = v[min];
+            v[min] = swap;
+            for (k = 0; k < tam; k++)
+            printf("%d ", v[k]);
+            printf("\n");
+        }
+    }
+}
+
+//Algoritmo de ordenacao HeapSort
+/* tam representa a quantidade de elementos, nao o ultimo indice. */
+void Heapfica(int* v, int pai, int tam) {
+    while (pai < tam / 2) {
+        int filho = 2 * pai + 1;
+        if (filho + 1 < tam && v[filho + 1] > v[filho]) filho++;
+        if (v[pai] >= v[filho]) break;
+        int temp = v[pai]; v[pai] = v[filho]; v[filho] = temp;
+        pai = filho;
+    }
+}
+void MontaHeapMax(int* v, int tam) {
+    for (int i = tam / 2 - 1; i >= 0; i--) Heapfica(v, i, tam);
+}
+void HeapSort(int* v, int tam) {
+    MontaHeapMax(v, tam);
+    for (int i = tam - 1; i >= 1; i--) {
+        int temp = v[0]; v[0] = v[i]; v[i] = temp;
+        Heapfica(v, 0, i);
+        for (int k = 0; k < tam; k++) printf("%d ", v[k]);
+        printf("\n");
+    }
+}
+
+void merge(int* vetor, int comeco, int meio, int fim) {
+    int posicao1 = comeco, posicao2 = meio + 1, posicaoAux = 0, tam = fim - comeco + 1;
+    int* vetAux;
+    vetAux = malloc((size_t)tam * sizeof(int));
+    if (vetAux == NULL) { fprintf(stderr, "Memoria insuficiente.\n"); exit(EXIT_FAILURE); }
+
+    while (posicao1 <= meio && posicao2 <= fim) {
+        if (vetor[posicao1] <= vetor[posicao2]) {
+            vetAux[posicaoAux] = vetor[posicao1];
+            posicao1++;
+        }
+        else {
+            vetAux[posicaoAux] = vetor[posicao2];
+            posicao2++;
+        }
+        posicaoAux++;
+    }
+
+    while (posicao1 <= meio) { //Caso ainda haja elementos na primeira metade
+        vetAux[posicaoAux] = vetor[posicao1];
+        posicaoAux++;
+        posicao1++;
+    }
+
+    while (posicao2 <= fim) { //Caso ainda haja elementos na segunda metade
+        vetAux[posicaoAux] = vetor[posicao2];
+        posicaoAux++;
+        posicao2++;
+    }
+
+    for (posicaoAux = comeco; posicaoAux <= fim; posicaoAux++) { //Move os elementos de
+        // volta para o vetor original
+        vetor[posicaoAux] = vetAux[posicaoAux - comeco];
+        printf("%d ", vetor[posicaoAux]);
+    }
+    printf("\n");
+
+    free(vetAux);
+}
+
+void mergeSort(int* vetor, int comeco, int fim) {
+    if (comeco < fim) {
+        int meio = comeco + (fim - comeco) / 2;
+        //apenas´para mostra na tela a 1a metade
+        for (int i = comeco; i <= meio; i++) {
+            printf("%d ", vetor[i]);
+        }
+        printf("\n");
+        mergeSort(vetor, comeco, meio);
+        //apenas´para mostra na tela a 2a metade
+        for (int i = meio+1; i <= fim; i++) {
+            printf("%d ", vetor[i]);
+        }
+        printf("\n");
+        mergeSort(vetor, meio + 1, fim);
+        merge(vetor, comeco, meio, fim);
+    }
+}
+
+/* Variante por contagem: aceita valores entre 0 e maximo, inclusive.
+Mantida a assinatura original: o vetor deve ter tamanho elementos. */
+void BucketSort1(int* v, int maximo) {
+    if (maximo < 0) { fprintf(stderr, "Maximo invalido.\n"); exit(EXIT_FAILURE); }
+    for (int i = 0; i < tamanho; i++) {
+        if (v[i] < 0 || v[i] > maximo) {
+            fprintf(stderr, "Valor fora de 0..maximo.\n"); exit(EXIT_FAILURE);
+        }
+    }
+    size_t quantidade = (size_t)maximo + 1;
+    if (quantidade > (size_t)-1 / sizeof(int)) exit(EXIT_FAILURE);
+    int* contagem = calloc(quantidade, sizeof(int));
+    if (!contagem) { fprintf(stderr, "Memoria insuficiente.\n"); exit(EXIT_FAILURE); }
+    for (int i = 0; i < tamanho; i++) contagem[v[i]]++;
+    int j = 0;
+    for (size_t i = 0; i < quantidade; i++) {
+        while (contagem[i] > 0) { v[j++] = (int)i; contagem[i]--; }
+    }
+    free(contagem);
+}
+
+/* Esta variante e Radix Sort decimal, para inteiros nao negativos.
+Mantida a assinatura original: o vetor deve ter tamanho elementos. */
+void bucketSort(int* v) {
+    int maior = 0;
+    int auxiliar[tamanho];
+    for (int i = 0; i < tamanho; i++) {
+        if (v[i] < 0) { fprintf(stderr, "Radix exige nao negativos.\n"); exit(EXIT_FAILURE); }
+        if (v[i] > maior) maior = v[i];
+    }
+    for (int exp = 1; maior / exp > 0; ) {
+        int contagem[10] = {0};
+        for (int i = 0; i < tamanho; i++) contagem[(v[i] / exp) % 10]++;
+        for (int i = 1; i < 10; i++) contagem[i] += contagem[i - 1];
+        for (int i = tamanho - 1; i >= 0; i--) {
+            int digito = (v[i] / exp) % 10;
+            auxiliar[--contagem[digito]] = v[i];
+        }
+        for (int i = 0; i < tamanho; i++) v[i] = auxiliar[i];
+        if (exp > maior / 10) break; /* evita overflow */
+        exp *= 10;
+    }
+}
+
+/* Baldes dinamicos: preserva repetidos e aceita negativos. */
+void BucketSort(int* v, int tam) {
+    if (tam <= 1) return;
+    int menor = v[0], maior = v[0];
+    for (int i = 1; i < tam; i++) {
+        if (v[i] < menor) menor = v[i];
+        if (v[i] > maior) maior = v[i];
+    }
+    long long faixa = (long long)maior - menor + 1;
+    int contagem[num_bucket] = {0}, inicio[num_bucket], proximo[num_bucket];
+    for (int i = 0; i < tam; i++) {
+        int b = (int)(((long long)v[i] - menor) * num_bucket / faixa);
+        contagem[b]++;
+    }
+    int total = 0;
+    for (int b = 0; b < num_bucket; b++) {
+        inicio[b] = proximo[b] = total; total += contagem[b];
+    }
+    if ((size_t)tam > (size_t)-1 / sizeof(int)) exit(EXIT_FAILURE);
+    int* dados = malloc((size_t)tam * sizeof(int));
+    if (!dados) { fprintf(stderr, "Memoria insuficiente.\n"); exit(EXIT_FAILURE); }
+    for (int i = 0; i < tam; i++) {
+        int b = (int)(((long long)v[i] - menor) * num_bucket / faixa);
+        dados[proximo[b]++] = v[i];
+    }
+    for (int b = 0; b < num_bucket; b++) BubbleSort(dados + inicio[b], contagem[b]);
+    for (int i = 0; i < tam; i++) v[i] = dados[i];
+    free(dados);
+}
+
+int main(void) {
+    int i, n;
+    int vbs[tamanho];
+    int vqs[tamanho];
+    int vis[tamanho];
+    int vbis[tamanho];
+    int vss[tamanho];
+    int vhs[tamanho];
+    int vms[tamanho];
+    int vus[tamanho];
+
+    //Cria numeros aleatorios para os vetores
+    for (i = 0; i < tamanho; i++) {
+        n = rand();
+        vbs[i] = n;
+        vqs[i] = n;
+        vis[i] = n;
+        vbis[i] = n;
+        vss[i] = n;
+        vhs[i] = n;
+        vms[i] = n;
+        vus[i] = n;
+    }
+    /*Ordenacao com BubbleSort*/
+    printf("=============================================\n");
+    printf("Ordenacao com BubbleSort: \n");
+    printf("=============================================\n");
+    printf("Vetor original: \n");
+    printf("---------------------------------------------\n");
+    for(i = 0; i < tamanho; i++){
+        printf("%d ", vbs[i]);
+    }
+    printf("\n---------------------------------------------\n");
+    printf("Passos da ordenacao: \n");
+    printf("---------------------------------------------\n");
+    BubbleSort(vbs, tamanho);
+    printf("Resultado final: ");
+    for (i = 0; i < tamanho; i++) printf("%d ", vbs[i]);
+    printf("\n");
+
+
+    /*Ordenacao com QuickSort*/
+    printf("\n\n\n=============================================\n");
+    printf("Ordenacao com QuickSort: \n");
+    printf("=============================================\n");
+    printf("Vetor original: \n");
+    printf("---------------------------------------------\n");
+    for(i = 0; i < tamanho; i++){
+        printf("%d ", vqs[i]);
+    }
+    printf("\n---------------------------------------------\n");
+    printf("Passos da ordenacao: \n");
+    printf("---------------------------------------------\n");
+    QuickSort(vqs, tamanho);
+    printf("Resultado final: ");
+    for (i = 0; i < tamanho; i++) printf("%d ", vqs[i]);
+    printf("\n");
+
+
+    /*Ordenacao com InsertionSort*/
+    printf("\n\n\n=============================================\n");
+    printf("Ordenacao com InsertionSort: \n");
+    printf("=============================================\n");
+    printf("Vetor original: \n");
+    printf("---------------------------------------------\n");
+    for(i = 0; i < tamanho; i++){
+        printf("%d ", vis[i]);
+    }
+    printf("\n---------------------------------------------\n");
+    printf("Passos da ordenacao: \n");
+    printf("---------------------------------------------\n");
+    InsertionSort(vis, tamanho);
+    printf("Resultado final: ");
+    for (i = 0; i < tamanho; i++) printf("%d ", vis[i]);
+    printf("\n");
+
+    /*Ordenacao com InsertionSort*/
+    printf("\n\n\n=============================================\n");
+    printf("Ordenacao com Binary InsertionSort: \n");
+    printf("=============================================\n");
+    printf("Vetor original: \n");
+    printf("---------------------------------------------\n");
+    for(i = 0; i < tamanho; i++){
+        printf("%d ", vbis[i]);
+    }
+    printf("\n---------------------------------------------\n");
+    printf("Passos da ordenacao: \n");
+    printf("---------------------------------------------\n");
+    insertionBinSort(vbis, tamanho);
+    printf("Resultado final: ");
+    for (i = 0; i < tamanho; i++) printf("%d ", vbis[i]);
+    printf("\n");
+
+
+    /*Ordenacao com SelectionSort*/
+    printf("\n\n\n=============================================\n");
+    printf("Ordenacao com SelectionSort: \n");
+    printf("=============================================\n");
+    printf("Vetor original: \n");
+    printf("---------------------------------------------\n");
+    for(i = 0; i < tamanho; i++){
+        printf("%d ", vss[i]);
+    }
+    printf("\n---------------------------------------------\n");
+    printf("Passos da ordenacao: \n");
+    printf("---------------------------------------------\n");
+    SelectionSort(vss, tamanho);
+    printf("Resultado final: ");
+    for (i = 0; i < tamanho; i++) printf("%d ", vss[i]);
+    printf("\n");
+
+
+    /*Ordenacao com HeapSort*/
+    printf("\n\n\n=============================================\n");
+    printf("Ordenacao com HeapSort: \n");
+    printf("=============================================\n");
+    printf("Vetor original: \n");
+    printf("---------------------------------------------\n");
+    for(i = 0; i < tamanho; i++){
+        printf("%d ", vhs[i]);
+    }
+    printf("\n---------------------------------------------\n");
+    printf("Passos da ordenacao: \n");
+    printf("---------------------------------------------\n");
+    HeapSort(vhs, tamanho);
+    printf("Resultado final: ");
+    for (i = 0; i < tamanho; i++) printf("%d ", vhs[i]);
+    printf("\n");
+
+
+    /*Ordenacao com MergeSort*/
+    printf("\n\n\n=============================================\n");
+    printf("Ordenacao com MergeSort: \n");
+    printf("=============================================\n");
+    printf("Vetor original: \n");
+    printf("---------------------------------------------\n");
+    for(i = 0; i < tamanho; i++){
+        printf("%d ", vms[i]);
+    }
+    printf("\n---------------------------------------------\n");
+    printf("Passos da ordenacao: \n");
+    printf("---------------------------------------------\n");
+    mergeSort(vms, 0, tamanho-1);
+    printf("Resultado final: ");
+    for (i = 0; i < tamanho; i++) printf("%d ", vms[i]);
+    printf("\n");
+
+
+    ///*Ordenacao com BucketSort
+    printf("\n\n\n=============================================\n");
+    printf("Ordenacao com BucketSort: \n");
+    printf("=============================================\n");
+    printf("Vetor original: \n");
+    printf("---------------------------------------------\n");
+    for (i = 0; i < tamanho; i++) {
+        printf("%d ", vus[i]);
+    }
+    printf("\n---------------------------------------------\n");
+    printf("Passos da ordenacao: \n");
+    printf("---------------------------------------------\n");
+    // BucketSort(vus, tamanho);
+    BucketSort(vus,tamanho);
+    printf("Resultado final: ");
+    for (i = 0; i < tamanho; i++) printf("%d ", vus[i]);
+    printf("\n");
+    //*/
+
+
+    return EXIT_SUCCESS;
+}
